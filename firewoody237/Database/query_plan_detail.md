@@ -80,3 +80,64 @@ SELECT /*+ USE_MERGE(e d) */
 FROM employees e
 JOIN departments d ON e.department_id = d.department_id;
 ```
+
+---
+
+## HASH JOIN
+- 주로 인덱스가 없거나 큰 테이블들을 조인할 때 사용
+- `Hash Table` 을 사용하여 매칭되는 행을 찾는 방식
+
+### 동작 방식
+1. 작은 테이블을 선택하고, 해시함수를 사용하여 `Hash Table` 을 생성
+2. 큰 테이블의 행을 읽으면서, `Hash Table` 에 해당 키값이 있는지 확인
+3. 키가 일치하는 경우, 두 행을 조합
+
+### 예시
+```
+SELECT E.EmployeeID, E.EmployeeName, D.DepartmentName
+FROM Employees E
+JOIN Departments D ON E.DepartmentID = D.DepartmentID;
+```
+![hash join](./images/image016.png)
+
+### 특징
+- 인덱스가 없는 대용량 데이터셋의 조인에 유리
+- 내부적으로 `Hash Table` 을 사용하기 때문에, 메모리 사용량이 큼
+
+---
+
+## BITMAP INDEX란?
+- 특정 컬럼의 값을 비트맵 형태로 저장하여 빠르게 검색을 수행
+- 저장공간이 적게들고, 여러 복잡한 쿼리를 효율적으로 처리
+- 고유한 값이 많지 않을 때 유리
+![bitmap](./images/image017.png)
+
+## BITMAP > CONVERSION > TO ROWIDS
+- 비트맵 인덱스를 사용하여 특정 행의 `ROWID` 를 반환
+### 동작 방식
+1. `BITMAP` 
+    - 비트맵 인덱스를 사용하여 조건에 맞는 레코드를 검색
+2. `CONVERSION` 
+    - 조건을 통해 비트맵 인덱스를 만족하는 행을 식별하여 `ROWID` 를 반환
+3. `TO ROWIDS` 
+    - 식별된 행들의 `ROWID`  목록을 반환
+
+## BITMAP > CONVERSION > FROM ROWIDS
+- `ROWID` 를 기반으로 실제 데이터에 접근하여 반환
+### 동작 방식
+1. `BITMAP` 
+    - 비트맵 인덱스를 사용하여 조건에 맞는 레코드를 검색
+2. `CONVERSION` 
+    - 조건을 통해 비트맵 인덱스를 만족하는 행을 식별하여 `ROWID` 를 반환
+3. `FROM ROWIDS` 
+    - 식별된 `ROWID` 를 통해 테이블의 실제 데이터에 접근하여 반환
+
+## BITMAP > CONVERSION > COUNT
+- 비트맵 인덱스를 활용하여 조건에 맞는 행의 개수를 효율적으로 반환
+### 동작 방식
+1. `BITMAP` 
+    - 비트맵 인덱스를 사용하여 조건에 맞는 레코드를 검색
+2. `CONVERSION` 
+    - 조건을 통해 비트맵 인덱스를 만족하는 행을 식별하여 비트맵 형태로 반환
+3. `COUNT` 
+    - 반환된 비트맵을 통해, COUNT를 계산
