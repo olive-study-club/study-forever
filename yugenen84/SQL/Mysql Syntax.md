@@ -64,3 +64,9 @@ select Now()
 ## Dual
  - dual 은 계산식을 테이블 생성없이 수행해보기 위한 용도로 일종의 더비 테이블임. 데이터가 있는 것이 아니라 임시의 공간임
 
+ ## ifnull
+ - ifnull(column, "null 일 경우 대체 값") from table;
+ - e.g. 
+    - select ifnull(name, "no name") as name
+    from HH
+
